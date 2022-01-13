@@ -9,6 +9,16 @@ export interface vec3 {
   z: number;
 }
 
+export enum AxisName {
+  x = "x",
+  y = "y",
+  z = "z",
+  t = "t",
+  p = "p",
+  r = "r",
+  c = "c",
+}
+
 export interface color {
   readonly r: number;
   readonly g: number;
@@ -20,19 +30,23 @@ export interface range {
   max: number;
 }
 
-export enum spreadMode {
-  strict = "strict",
-  expand = "expand",
-  flat = "flat",
+export interface image extends range {
+  min: number;
+  max: number;
+  length: number;
+  axisName: string;
 }
 
 export interface domain {
-  range?: range;
-  interval?: number;
-  groupMap?: Map<string, number>;
-  groupKeys?: string[];
-  groupValues?: dataUnit[][];
-  groupLengths?: number[];
+  axisName: string;
+  range: range;
+  groupedInfo: groupedInfo;
+}
+
+export interface groupedInfo {
+  keys: string[];
+  lengths: number[];
+  mappings: mappingType[];
 }
 
 export enum mappingType {
@@ -52,4 +66,18 @@ export enum CoordSystem {
   Cartesian = "xyz",
   Spherical = "tpr",
   Cylindrical = "trz",
+}
+
+export interface UVCounter {
+  count: number;
+  max: [number, number, number];
+  UVRanges: [range, range, range];
+  slices: [number, number, number];
+  dirty: boolean;
+}
+
+export function generateID(): string {
+  return Array.from({ length: 16 }, () =>
+    Math.floor(Math.random() * 16).toString(16)
+  ).join("");
 }

@@ -2,7 +2,7 @@
   <div class="sd-controller">
     <!-- 设置坐标系 -->
     <div class="controller-group">
-      <span class="coords-label">请选择要使用的坐标系：</span>
+      <span class="coords-label">请选择要使用的坐标系:</span>
       <el-select
         class="coord-selector"
         v-model="activeCoord"
@@ -54,15 +54,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  reactive,
-  ref,
-  toRefs,
-  PropType,
-  watch,
-} from "vue";
+import { computed, defineComponent, toRefs, PropType, watch } from "vue";
 import { CoordSystem, mappingType } from "@/sketches/sanddance/SandDance";
 import { useStore } from "@/store";
 
@@ -191,3 +183,4 @@ export default defineComponent({
   },
 });
 </script>
+<style lang="less" scoped src="./sand-dance-style.less"></style>

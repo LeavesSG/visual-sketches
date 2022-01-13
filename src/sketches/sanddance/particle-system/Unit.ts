@@ -2,7 +2,7 @@ import { Axis } from "./Axis";
 import { Graph3D } from "./Graph";
 import { useMapping } from "./Mapping";
 import { _get, _proximate } from "./SETTING";
-import { color, dataUnit, range, vec3 } from "../SandDance";
+import { color, dataUnit, image, range, vec3 } from "../SandDance";
 
 export default class Unit {
   public data: dataUnit;
@@ -14,14 +14,7 @@ export default class Unit {
   private moveSpeed: vec3 = { x: 0, y: 0, z: 0 };
   public framesTake = 0;
 
-  public OnAxisRange = new Map([
-    ["x", { min: 0, max: 0 }],
-    ["y", { min: 0, max: 0 }],
-    ["z", { min: 0, max: 0 }],
-    ["t", { min: 0, max: 0 }],
-    ["p", { min: 0, max: 0 }],
-    ["r", { min: 0, max: 0 }],
-  ]);
+  public OnAxisRange = new Map<string, image>();
 
   public onAxisValue: Map<string, number> = new Map();
 
@@ -73,33 +66,30 @@ export default class Unit {
     this.bindGraph = graph;
   }
 
-  getRangeOnAxis(axis: Axis): range {
-    if (!this.data[axis.bindKey]) return { min: 0, max: 0 };
-
+  getRangeOnAxis(axis: Axis): image {
     const domain = axis.getDomain();
     const codomain = axis.getCodomain();
     let preimage = "";
     switch (axis.mappingType) {
       case "linear": {
-        preimage = this.data[axis.bindKey].toString();
+        preimage = String(this.data[axis.bindKey]);
         break;
       }
       case "accumulate":
       case "discrete":
       case "stack": {
-        preimage = this.data[axis.bindKey].toString();
+        preimage = String(this.data[axis.bindKey]);
         break;
       }
     }
-
     const value = useMapping(axis.mappingType)(domain, codomain)(preimage);
     return value;
   }
 
   settPositionOnGraph(): void {
     this.bindGraph.useAxes.forEach((axis) => {
-      const range: range = this.getRangeOnAxis(axis);
-      this.OnAxisRange.set(axis.name, range);
+      const image: image = this.getRangeOnAxis(axis);
+      this.OnAxisRange.set(axis.name, image);
     });
   }
 

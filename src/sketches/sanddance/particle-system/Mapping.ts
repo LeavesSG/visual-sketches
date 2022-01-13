@@ -1,141 +1,130 @@
-import { domain, range } from "@/sketches/sanddance/SandDance";
+import { domain, image, range } from "@/sketches/sanddance/SandDance";
+
+const cache = new Map<domain, image[]>();
 
 const Mapping = {
-  /** @require domain.range */
-  linearMapping: (domain: domain, codomain: domain) => {
-    if (!codomain.range)
-      console.warn("Linear Mapping: Lack of required codomain range info!");
-    const codomainRange = codomain.range || { min: 0, max: 0 };
-    const size: number = codomainRange.max - codomainRange.min;
-    if (!domain.range)
-      console.warn("Linear Mapping: Lack of required domain range info!");
-    const domainRange = domain.range;
-    if (!domainRange) return () => ({ max: 0, min: 0 });
-    else {
-      if (size == 0) return () => codomainRange;
-      if (domainRange.max - domainRange.min === 0) {
-        const mid = (codomainRange.min + codomainRange.max) / 2;
-        return () => ({ min: mid, max: mid });
-      }
+  linearMapping: (domain: domain, codomain: range) => {
+    const image: image = {
+      axisName: domain.axisName || "",
+      min: 0,
+      max: 0,
+      length: 0,
+    };
+    const codomainSize = codomain.max - codomain.min;
+    const domainSize = domain.range.max - domain.range.min;
+    if (Number.isNaN(domainSize))
+      return () => {
+        const temp = { ...image, ...codomain };
+        return temp;
+      };
+    if (codomainSize == 0 || domainSize === 0) {
+      const mid = (codomain.min + codomain.max) / 2;
+      image.min = mid;
+      image.max = mid;
+      return () => image;
+    }
 
-      const scale = size / (domainRange.max - domainRange.min);
-      return (preImg: string) => {
-        const preImgNumber = Number(preImg);
-        // if (Number.isNaN(preImgNumber)) console.warn('Linear Mapping: Preimage has to be a number string!')
-        const image: range = {
-          min: (preImgNumber - domainRange.min) * scale + codomainRange.min,
-          max: (preImgNumber - domainRange.min) * scale + codomainRange.min,
+    const scale = codomainSize / domainSize;
+    return (preImg: string) => {
+      const preImgNumber = Number(preImg);
+      image.min = (preImgNumber - domain.range.min) * scale + codomain.min;
+      image.max = (preImgNumber - domain.range.min) * scale + codomain.min;
+      return image;
+    };
+  },
+
+  discreteMapping: (domain: domain, codomain: range) => {
+    let images = cache.get(domain);
+    const codomainSize = codomain.max - codomain.min;
+
+    const keys = domain.groupedInfo.keys;
+    const lengths = domain.groupedInfo.lengths;
+    const interval = 0.08;
+    const slice = codomainSize / (keys.length + interval * keys.length);
+    if (interval > slice)
+      console.warn("Discrete Mapping: Domain interval too large");
+
+    if (!images) {
+      images = keys.map((key, idx): image => {
+        return {
+          axisName: domain.axisName || "",
+          min: codomain.min + idx * slice,
+          max: codomain.min + (idx + 1) * slice - interval,
+          length: lengths[idx],
         };
-        return image;
-      };
+      });
+      cache.set(domain, images);
     }
-  },
-
-  /** @require domain.groupMap, domain.interval */
-  discreteMapping: (domain: domain, codomain: domain) => {
-    if (!codomain.range)
-      console.warn("Discrete Mapping: Lack of required codomain range info!");
-    const codomainRange = codomain.range || { min: 0, max: 0 };
-    const size: number = codomainRange.max - codomainRange.min;
-    if (size == 0) {
-      return () => codomainRange;
-    }
-
-    if (!domain.groupMap)
-      console.warn("Discrete Mapping: Lack of required domain groupMap info!");
-    if (!domain.interval)
-      console.warn("Discrete Mapping: Lack of required domain interval info!");
-    const enums = domain.groupKeys || [];
-
-    const interval = domain.interval || 0;
-    const slice = size / (enums.length + interval * enums.length);
-
     return (preImg: string) => {
-      const foundIndex = enums.indexOf(preImg);
-      if (interval > slice)
-        console.warn("Discrete Mapping: Domain interval too large");
-      const min = codomainRange.min + foundIndex * slice;
-      const max = codomainRange.min + (foundIndex + 1) * slice - interval;
-      const image = {
-        min: min,
-        max: max,
-      };
-      if (max - min < 0.5) {
-        console.log(min, max, foundIndex);
-      }
-      return image;
+      const foundIndex = keys.indexOf(preImg);
+      return (images || [])[foundIndex];
     };
   },
 
-  /** @require domain.groupMap, domain.groupLengths */
-  accumulateMapping(domain: domain, codomain: domain) {
-    if (!codomain.range)
-      console.warn("Accumulate Mapping: Lack of required codomain range info!");
-    const codomainRange = codomain.range || { min: 0, max: 0 };
-    const size: number = codomainRange.max - codomainRange.min;
-    if (size == 0) return () => codomainRange;
-    const groupMap = domain.groupMap || new Map();
-    if (groupMap.size <= 0)
-      console.warn(
-        "Accumulate Mapping: Lack of required domain groupMap info!"
-      );
-    const values = domain.groupLengths || [];
-    const max = Math.max(...values);
+  accumulateMapping(domain: domain, codomain: range) {
+    let images = cache.get(domain);
+    const codomainSize = codomain.max - codomain.min;
+    const keys = domain.groupedInfo.keys;
+    const lengths = domain.groupedInfo.lengths;
+    const max = Math.max(...lengths);
+    if (!images) {
+      images = keys.map((key, idx): image => {
+        return {
+          axisName: domain.axisName || "",
+          min: codomain.min,
+          max: (lengths[idx] / max) * codomainSize + codomain.min,
+          length: lengths[idx],
+        };
+      });
+      cache.set(domain, images);
+    }
     return (preImg: string) => {
-      if ((groupMap.get(preImg) / max) * size + codomainRange.min < 1)
-        console.log(groupMap.get(preImg), size);
-      const image: range = {
-        min: codomainRange.min,
-        max: (groupMap.get(preImg) / max) * size + codomainRange.min,
-      };
-      return image;
+      const foundIndex = keys.indexOf(preImg);
+      return (images || [])[foundIndex];
     };
   },
+  stackMapping(domain: domain, codomain: range) {
+    let images = cache.get(domain);
+    const codomainSize = codomain.max - codomain.min;
+    const keys = domain.groupedInfo.keys;
+    const lengths = domain.groupedInfo.lengths;
+    const keyNums = keys.length;
+    const sum = lengths.reduce((a, c) => a + c, 0);
+    const interval = 0.08;
+    const expectedSum = sum * (1 + interval);
+    const intervalPiece = interval / keyNums;
 
-  /** @require domain.groupMap, domain.interval */
-  stackMapping(domain: domain, codomain: domain) {
-    if (!codomain.range)
-      console.warn("Stack Mapping: Lack of required codomain range info!");
-    const codomainRange = codomain.range || { min: 0, max: 0 };
-    const size: number = codomainRange.max - codomainRange.min;
-    if (size == 0) return () => codomainRange;
-
-    if (!domain.groupMap)
-      console.warn("Stack Mapping: Lack of required domain groupMap info!");
-    if (!domain.interval)
-      console.warn("Stack Mapping: Lack of required domain interval info!");
-    const groupMap = domain.groupMap || new Map();
-    const groupKeys: string[] = [];
-    const groupValues: number[] = [];
-    const length = groupKeys.length;
-    groupMap.forEach((v, k) => {
-      groupKeys.push(k);
-      groupValues.push(v);
-    });
-    const sum = groupValues.reduce((a, c) => a + c, 0);
-    const interval = domain.interval || 0;
     if (1 - interval * length <= 0)
       console.warn("Stack Mapping: Domain interval too large");
+
+    if (!images) {
+      images = keys.map((key, idx): image => {
+        const minPercent =
+          lengths.slice(0, idx).reduce((a, c) => a + c, 0) / expectedSum +
+          idx * intervalPiece;
+        const maxPercent =
+          lengths.slice(0, idx + 1).reduce((a, c) => a + c, 0) / expectedSum +
+          idx * intervalPiece;
+        return {
+          axisName: domain.axisName || "",
+          min: minPercent * codomainSize + codomain.min,
+          max: maxPercent * codomainSize + codomain.min,
+          length: lengths[idx],
+        };
+      });
+      cache.set(domain, images);
+    }
+
     return (preImg: string) => {
-      const foundIndex = groupKeys.indexOf(preImg);
-      const minPercent =
-        groupValues.slice(0, foundIndex).reduce((a, c) => a + c, 0) / sum +
-        foundIndex * interval;
-      const maxPercent =
-        groupValues.slice(0, foundIndex + 1).reduce((a, c) => a + c, 0) / sum +
-        foundIndex * interval;
-      const image = {
-        min: minPercent * size + codomainRange.min,
-        max: maxPercent * size + codomainRange.min,
-      };
-      return image;
+      const foundIndex = keys.indexOf(preImg);
+      return (images || [])[foundIndex];
     };
   },
 };
 
 export function useMapping(
   type: string
-): (arg0: domain, arg1: domain) => (arg2: string) => range {
+): (arg0: domain, arg1: range) => (arg2: string) => image {
   switch (type) {
     case "linear":
       return Mapping.linearMapping;
@@ -148,4 +137,8 @@ export function useMapping(
     default:
       return Mapping.linearMapping;
   }
+}
+
+export function clearCache(): void {
+  cache.clear();
 }

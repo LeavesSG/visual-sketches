@@ -1,33 +1,25 @@
 import {
+  AxisName,
   dataUnit,
   domain,
   mappingType,
   vec3,
   range,
-} from "@/sketches/sanddance/SandDance";
+  groupedInfo,
+} from "./../SandDance";
 import _ from "lodash";
 
-interface groupedInfo {
-  grouped:
-    | _.Dictionary<[dataUnit, ...dataUnit[]]>
-    | { undefined: dataUnit[][] };
-  groupedKeys: string[];
-  groupedValues: dataUnit[][];
-  lengths: number[];
-  availableMappings: mappingType[];
-}
-
 export class Axis {
-  public name: string;
-  private min = 0;
-  private max = 100;
+  public name: AxisName = AxisName.x;
+  public min = 0;
+  public max = 100;
   public scale = 1;
   private zero: vec3 = { x: 0, y: 0, z: 0 };
 
   public bindKey: keyof dataUnit = "";
   public bindKeys: (keyof dataUnit)[] = [];
   public domain!: domain;
-  public codomain!: domain;
+  public codomain!: range;
 
   private bindDataset: dataUnit[] = [];
 
@@ -38,7 +30,7 @@ export class Axis {
   private domainNeedUpdate = false;
 
   constructor(
-    name: string,
+    name: AxisName,
     zero: vec3,
     min: number,
     max: number,
@@ -53,7 +45,7 @@ export class Axis {
     if (type) this.mappingType = type;
   }
 
-  getCodomain(): domain {
+  getCodomain(): range {
     if (this.codomain) return this.codomain;
     this.updateCodomain();
     return this.codomain;
@@ -61,10 +53,8 @@ export class Axis {
 
   updateCodomain(): void {
     this.codomain = {
-      range: {
-        min: this.min,
-        max: this.max,
-      },
+      min: this.min,
+      max: this.max,
     };
   }
 
@@ -95,23 +85,20 @@ export class Axis {
     const bindKey: keyof dataUnit = this.bindKey;
     if (!this.bindKey || !this.bindKeys)
       return {
-        grouped: { undefined: [dataset] },
-        groupedKeys: ["undefined"],
-        groupedValues: [dataset],
+        keys: ["undefined"],
         lengths: [dataset.length],
-        availableMappings: [mappingType.linear],
+        mappings: [mappingType.linear],
       };
     const grouped = _.groupBy(dataset, bindKey.toString());
-    const groupedKeys = Object.keys(grouped);
-    const groupedValues = Object.values(grouped);
-
+    const keys = Object.keys(grouped);
     const lengths = Object.values(grouped).map((arr) => arr.length);
+
     const groupNum = lengths.length;
     const avgGroupSize = dataset.length / groupNum;
 
-    let availableMappings: mappingType[] = [];
+    let mappings: mappingType[] = [];
     if (groupNum < avgGroupSize) {
-      availableMappings = [
+      mappings = [
         mappingType.linear,
         mappingType.discrete,
         mappingType.stack,
@@ -119,21 +106,19 @@ export class Axis {
       ];
       this.mappingType = mappingType.linear;
     } else {
-      availableMappings = [mappingType.linear];
+      mappings = [mappingType.linear];
       this.mappingType = mappingType.linear;
     }
     this.groupedInfo = {
-      grouped,
-      groupedKeys,
-      groupedValues,
+      keys,
       lengths,
-      availableMappings,
+      mappings,
     };
     return this.groupedInfo;
   }
 
   getAvailableMappingType(): mappingType[] {
-    return this.groupedInfo?.availableMappings || [];
+    return this.groupedInfo?.mappings || [];
   }
 
   setMappingType(mappingType: mappingType): void {
@@ -141,25 +126,19 @@ export class Axis {
     this.domainNeedUpdate = true;
   }
 
-  async updateDomain(): Promise<void> {
+  updateDomain(): void {
     const dataset = this.bindDataset;
     const bindKey: keyof dataUnit = this.bindKey;
-    const interval = 0.05;
-    const range: range = { min: 0, max: 0 };
-    const groupMap = new Map();
 
+    const range: range = { min: 0, max: 0 };
     if (!this.groupedInfo) {
       this.groupedInfo = this.groupDataset();
     }
-    const { groupedKeys, groupedValues, lengths } = this.groupedInfo;
 
     const domain: domain = {
       range,
-      interval,
-      groupMap,
-      groupKeys: groupedKeys,
-      groupValues: groupedValues,
-      groupLengths: lengths,
+      groupedInfo: this.groupedInfo,
+      axisName: this.name,
     };
     switch (this.mappingType) {
       case "linear": {
@@ -168,18 +147,13 @@ export class Axis {
           min = Math.min(min, Number(row1[bindKey]));
           max = Math.max(max, Number(row1[bindKey]));
         });
-        if (domain.range) {
-          domain.range.min = min;
-          domain.range.max = max;
-        }
+        domain.range.min = min;
+        domain.range.max = max;
         break;
       }
       case "accumulate":
       case "stack":
       case "discrete":
-        groupedKeys.forEach((key, index) => {
-          (domain.groupMap as Map<string, number>).set(key, lengths[index]);
-        });
         break;
     }
     this.domainNeedUpdate = false;

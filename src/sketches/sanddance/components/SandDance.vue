@@ -14,7 +14,7 @@ import { defineComponent, ref, onMounted } from "@vue/runtime-core";
 import useParticleSystem from "@/composables/useParticleSystem";
 import useBabylonScene from "@/composables/useBabylonPCS";
 import mockData from "@/mockData";
-import { CloudPoint } from "@babylonjs/core";
+import { CloudPoint, Color4 } from "@babylonjs/core";
 import {
   SceneInfo,
   dataUnit,
@@ -74,16 +74,19 @@ export default defineComponent({
 
     const update = (): void => {
       changeGraph();
-      // const SPS = this.sceneInfo.SPS;
-      // SPS.particles.forEach((p) => {
-      //   const color = this.sys.unitArray[p.idx].getColor();
-      //   p.color = new Color4(
-      //     color[0] / 255,
-      //     color[1] / 255,
-      //     color[2] / 255,
-      //     0.8
-      //   );
-      // });
+      const SPS = sceneInfo.ps;
+      if (SPS) {
+        SPS.particles.forEach((p) => {
+          const color = PSG.unitArray[p.idx].getColor();
+          p.color = new Color4(
+            color[0] / 255,
+            color[1] / 255,
+            color[2] / 255,
+            1
+          );
+        });
+      }
+
       console.log(PSG);
     };
     const initAnimation = () => {

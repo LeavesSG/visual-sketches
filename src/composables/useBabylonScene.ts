@@ -1,4 +1,3 @@
-import { Engine, Scene, Vector3 } from "@babylonjs/core";
 import * as BABYLON from "@babylonjs/core";
 
 export default function (
@@ -6,12 +5,12 @@ export default function (
   defaultCamera = false,
   defaultLight = false
 ): {
-  scene: Scene;
-  engine: Engine;
+  scene: BABYLON.Scene;
+  engine: BABYLON.Engine;
   render: () => void;
 } {
-  const engine = new Engine(canvas);
-  const scene = new Scene(engine);
+  const engine = new BABYLON.Engine(canvas);
+  const scene = new BABYLON.Scene(engine);
 
   scene.clearColor = new BABYLON.Color4(0, 0, 0, 0);
 

@@ -1,20 +1,18 @@
 import {
   color,
   dataUnit,
-  domain,
+  generateID,
   mappingType,
   range,
   vec3,
 } from "@/sketches/sanddance/SandDance";
 import { Axis } from "./Axis";
 import { Graph3D } from "./Graph";
-import { useMapping } from "./Mapping";
+import { clearCache, useMapping } from "./Mapping";
 import Unit from "./Unit";
 
 class ParticleSystem {
-  public Id: string = Array.from({ length: 16 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join("");
+  public Id: string = generateID();
   public bufferSize = 0;
   public unitArray: Unit[] = [];
   public activeGraph: Graph3D = new Graph3D();
@@ -53,13 +51,20 @@ class ParticleSystem {
   }
 
   mapAll() {
+    clearCache();
     this.unitArray.forEach((e) => {
       e.settPositionOnGraph();
-      this.activeGraph.randomFill(e);
+    });
+
+    this.activeGraph.groupAllArea(this.unitArray);
+    console.log(this.activeGraph.areaGrouper);
+    this.unitArray.forEach((e) => {
+      this.activeGraph.evenlyFill(e);
       e.targetPos = this.activeGraph.locateUnit(e);
       e.startMove();
     });
-    // this.colorAllUnits()
+    clearCache();
+    this.colorAllUnits();
   }
 
   setUsingAxesByString(str: string): void {
@@ -91,34 +96,29 @@ class ParticleSystem {
     return this.activeGraph.axes.get(axisName)?.getAvailableMappingType();
   }
 
-  async colorAllUnits() {
+  colorAllUnits() {
     const axis: Axis = this.activeGraph.useAxes.find(
       (e) => e.name === "x" || e.name === "t"
     ) as Axis;
     const colorByKey = axis.bindKey;
     const mappingType: string = axis.mappingType;
-    const axisDomain = await axis.getDomain();
+    const axisDomain = axis.getDomain();
     const colors = this.generateColors();
     const color1 = colors[0];
     const color2 = colors[1];
+
     this.unitArray.forEach((unit) => {
-      const rcodomain: domain = {
-        range: {
-          min: Math.min(color1.r, color2.r),
-          max: Math.max(color1.r, color2.r),
-        },
+      const rcodomain: range = {
+        min: Math.min(color1.r, color2.r),
+        max: Math.max(color1.r, color2.r),
       };
       const gcodomain = {
-        range: {
-          min: Math.min(color1.g, color2.g),
-          max: Math.max(color1.g, color2.g),
-        },
+        min: Math.min(color1.g, color2.g),
+        max: Math.max(color1.g, color2.g),
       };
       const bcodomain = {
-        range: {
-          min: Math.min(color1.b, color2.b),
-          max: Math.max(color1.b, color2.b),
-        },
+        min: Math.min(color1.b, color2.b),
+        max: Math.max(color1.b, color2.b),
       };
       const preimage: string = unit.data[colorByKey].toString();
 
@@ -138,9 +138,9 @@ class ParticleSystem {
   generateColors() {
     const colors: color[] = [];
     for (let j = 0; j < 2; j++) {
-      const r = 100 + Math.random() * 155;
-      const g = 100 + Math.random() * 155;
-      const b = 100 + Math.random() * 155;
+      const r = 55 + Math.random() * j * 100;
+      const g = 55 + Math.random() * j * 100;
+      const b = 55 + Math.random() * j * 100;
       const color = {
         r,
         g,

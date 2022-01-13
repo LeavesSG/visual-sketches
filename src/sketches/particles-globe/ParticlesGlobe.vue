@@ -177,11 +177,11 @@ export default defineComponent({
         },
         {
           frame: frameRate * 30,
-          value: new BABYLON.Vector3(0, -Math.PI, 0),
+          value: new BABYLON.Vector3(0, -Math.PI, -Math.PI / 10),
         },
         {
           frame: frameRate * 60,
-          value: new BABYLON.Vector3(0, -Math.PI * 2, 0),
+          value: new BABYLON.Vector3(0, -Math.PI * 2, Math.PI / 10),
         },
       ];
       rotateY.setKeys(keyFrames);

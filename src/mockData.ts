@@ -11,7 +11,7 @@ export const randomizer = {
   },
 };
 
-const mockData = Array.from({ length: 40000 }, (e, i) => {
+const mockData = Array.from({ length: 80000 }, (e, i) => {
   return {
     name: "数据项-" + i,
     id: i,
