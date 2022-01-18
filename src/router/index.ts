@@ -29,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "imageDanmaku",
     component: () =>
       import(
-        /* webpackChunkName: "imageDanmaku" */ "../sketches/image-danmaku/ViewImgDanmaku.vue"
+        /* webpackChunkName: "imageDanmaku" */ "../sketches/bubble-wall/BubbleWall.vue"
       ),
   },
 ];

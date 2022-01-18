@@ -39,7 +39,7 @@ const Mapping = {
 
     const keys = domain.groupedInfo.keys;
     const lengths = domain.groupedInfo.lengths;
-    const interval = 0.08;
+    const interval = 0.12;
     const slice = codomainSize / (keys.length + interval * keys.length);
     if (interval > slice)
       console.warn("Discrete Mapping: Domain interval too large");
@@ -90,7 +90,7 @@ const Mapping = {
     const lengths = domain.groupedInfo.lengths;
     const keyNums = keys.length;
     const sum = lengths.reduce((a, c) => a + c, 0);
-    const interval = 0.08;
+    const interval = 0.1;
     const expectedSum = sum * (1 + interval);
     const intervalPiece = interval / keyNums;
 

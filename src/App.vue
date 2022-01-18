@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-tabs v-model="path" @tab-click="handleClick" class="nav">
-      <el-tab-pane label="Home" name=""></el-tab-pane>
+      <el-tab-pane label="Home" name=" "></el-tab-pane>
       <el-tab-pane label="SandDance" name="sanddance"></el-tab-pane>
       <el-tab-pane label="ParticlesGlobe" name="particlesglobe"></el-tab-pane>
       <el-tab-pane label="ImageDanmaku" name="imageDanmaku"></el-tab-pane>
@@ -32,7 +32,7 @@ export default defineComponent({
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  background: linear-gradient(90deg, #90f6d8, #90d8f9);
+  background: #111;
   color: #fff;
   width: 100vw;
   height: 100vh;
@@ -41,7 +41,14 @@ export default defineComponent({
   left: 0;
 }
 .nav {
+  position: fixed;
   display: flex;
   justify-content: center;
+  z-index: 1;
+  width: 100vw;
+
+  .el-tabs__item {
+    color: #fefefe;
+  }
 }
 </style>

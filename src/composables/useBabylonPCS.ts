@@ -29,17 +29,17 @@ export default function (
   );
   new BABYLON.HemisphericLight("directio", new BABYLON.Vector3(0, 0, 1), scene);
 
-  const SPS = new BABYLON.PointsCloudSystem("pcs", 5, scene);
+  const SPS = new BABYLON.PointsCloudSystem("pcs", 2, scene);
 
   const myfunc = function (
     particle: { position: unknown; color: unknown },
     i: number
   ) {
-    particle.position = new BABYLON.Vector3(
-      100 * Math.random() - 50,
-      100 * Math.random() - 50,
-      100 * Math.random() - 50
-    );
+    const n = Math.floor((Math.random() * 100) % 100);
+    const x = ((Math.PI * 2 * 0.618 * n) % (Math.PI * 2)) * 100;
+    const y = n;
+    const z = 0;
+    particle.position = new BABYLON.Vector3(x, y, z);
     particle.color = new BABYLON.Color4(1, 1, 1, 0.8);
   };
 

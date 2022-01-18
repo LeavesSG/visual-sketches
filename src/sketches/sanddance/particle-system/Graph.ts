@@ -177,6 +177,7 @@ export class Graph3D {
       }
     });
     // calculate UV range, slice count
+    let hasIsolate = false;
     unitArray.forEach((unit) => {
       areaKey = this.getAreaKey(unit);
       const counter = this.areaGrouper.get(areaKey);
@@ -206,12 +207,12 @@ export class Graph3D {
             1 / validateAxesCount
           );
           ranges.forEach((range, index) => {
-            debugger;
             if (range) counter.UVRanges[index] = range;
             if (sizes[index]) {
               const max = Math.ceil(sizes[index] * coefficient);
               counter.max[index] = max;
               counter.slices[index] = sizes[index] / max;
+              if (counter.count === 1) hasIsolate = true;
             } else {
               counter.max[index] = 1;
               counter.slices[index] = 0;
@@ -222,6 +223,10 @@ export class Graph3D {
         }
       }
     });
+    if (hasIsolate)
+      console.warn(
+        `Not suitable for EVENLY FILL MODE, use RANDOM FILL MODE instead!`
+      );
   }
 
   linearFill(range: range, slice: number, index: number): number {
@@ -230,14 +235,52 @@ export class Graph3D {
 
   cardToUV(range: range, codomain: range, axisName: AxisName): range {
     const size = codomain.max - codomain.min;
+    const umin = (range.min - codomain.min) / size;
+    const umax = (range.max - codomain.min) / size;
+    if (this.useAxesString() === "123") {
+      switch (axisName) {
+        case "p":
+          return {
+            min: (1 - Math.cos(range.min)) / 2,
+            max: (1 - Math.cos(range.max)) / 2,
+          };
+        case "t":
+          return {
+            min: (range.min / Math.PI) * 2,
+            max: (range.max / Math.PI) * 2,
+          };
+        case "r":
+          return {
+            min: Math.pow(umin, 2),
+            max: Math.pow(umax, 2),
+          };
+        default:
+          return {
+            min: umin,
+            max: umax,
+          };
+      }
+    }
     return {
-      min: (range.min - codomain.min) / size,
-      max: (range.max - codomain.min) / size,
+      min: umin,
+      max: umax,
     };
   }
 
   uvToCard(finalUV: number, codomain: range, axisName: AxisName): number {
     const size = codomain.max - codomain.min;
+    if (this.useAxesString() === "123") {
+      switch (axisName) {
+        case "t":
+          return 2 * Math.PI * finalUV;
+        case "p":
+          return Math.acos(2 * finalUV - 1);
+        case "r":
+          return size * Math.sqrt(finalUV);
+        default:
+          return codomain.min + size * finalUV;
+      }
+    }
     return codomain.min + size * finalUV;
   }
 
@@ -245,7 +288,7 @@ export class Graph3D {
     index: number,
     uMax: number,
     vMax: number,
-    wMax: number
+    _wMax: number
   ): [number, number, number] {
     const S = uMax * vMax;
     const u = index % uMax;
@@ -255,13 +298,11 @@ export class Graph3D {
   }
 
   evenlyFill(unit: Unit): void {
-    debugger;
     const areaKey = this.getAreaKey(unit);
     const counter = this.areaGrouper.get(areaKey);
     if (counter) {
       const UVs = this.counterToUVW(counter.count, ...counter.max);
       this.useAxes.forEach((axis, index) => {
-        debugger;
         const image = unit.OnAxisRange.get(axis.name);
         if (image) {
           const finalUV = this.linearFill(
