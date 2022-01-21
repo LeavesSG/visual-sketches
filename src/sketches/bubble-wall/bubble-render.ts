@@ -55,7 +55,7 @@ export default defineComponent({
       states[index].position = getInitPos();
       states[index].acceleration = {
         x: Math.random() * 2 - 1,
-        y: -100,
+        y: -Math.random() * 50 - 80,
         z: Math.random() * 2 - 1,
       };
     };

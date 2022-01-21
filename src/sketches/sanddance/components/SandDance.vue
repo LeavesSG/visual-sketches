@@ -13,7 +13,7 @@
 import { defineComponent, ref, onMounted } from "@vue/runtime-core";
 import useParticleSystem from "@/composables/useParticleSystem";
 import useBabylonScene from "@/composables/useBabylonPCS";
-import mockData from "@/mockData";
+import mockData from "@/utils/mockData";
 import { CloudPoint, Color4 } from "@babylonjs/core";
 import {
   SceneInfo,

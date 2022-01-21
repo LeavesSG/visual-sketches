@@ -8,13 +8,13 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
-    path: "/sanddance",
+    path: "/sand-dance",
     name: "SandDance",
     component: () =>
       import(/* webpackChunkName: "sanddance" */ "../views/ViewSandDance.vue"),
   },
   {
-    path: "/particlesglobe",
+    path: "/particles-globe",
     name: "ParticlesGlobe",
     // route level code-splitting
     // this generates a separate chunk (about.[hash].js) for this route
@@ -25,11 +25,27 @@ const routes: Array<RouteRecordRaw> = [
       ),
   },
   {
-    path: "/imageDanmaku",
-    name: "imageDanmaku",
+    path: "/bubble-wall",
+    name: "bubble-wall",
     component: () =>
       import(
         /* webpackChunkName: "imageDanmaku" */ "../sketches/bubble-wall/BubbleWall.vue"
+      ),
+  },
+  {
+    path: "/filter-effect",
+    name: "filter-effect",
+    component: () =>
+      import(
+        /* webpackChunkName: "filtereffect" */ "../sketches/filter-effect/filter-effect.vue"
+      ),
+  },
+  {
+    path: "/algs-visualize",
+    name: "Algorithm Visualization",
+    component: () =>
+      import(
+        /* webpackChunkName: "algs-visualize" */ "../sketches/algorithm-visualize/algs-visualize.vue"
       ),
   },
 ];

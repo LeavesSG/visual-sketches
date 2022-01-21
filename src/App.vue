@@ -2,9 +2,14 @@
   <div class="app-container">
     <el-tabs v-model="path" @tab-click="handleClick" class="nav">
       <el-tab-pane label="Home" name=" "></el-tab-pane>
-      <el-tab-pane label="SandDance" name="sanddance"></el-tab-pane>
-      <el-tab-pane label="ParticlesGlobe" name="particlesglobe"></el-tab-pane>
-      <el-tab-pane label="ImageDanmaku" name="imageDanmaku"></el-tab-pane>
+      <el-tab-pane label="SandDance" name="sand-dance"></el-tab-pane>
+      <el-tab-pane label="ParticlesGlobe" name="particles-globe"></el-tab-pane>
+      <el-tab-pane label="BubbleWall" name="bubble-wall"></el-tab-pane>
+      <el-tab-pane label="FilterEffect" name="filter-effect"></el-tab-pane>
+      <el-tab-pane
+        label="Algorithm Visualization"
+        name="algs-visualize"
+      ></el-tab-pane>
     </el-tabs>
     <router-view />
   </div>
