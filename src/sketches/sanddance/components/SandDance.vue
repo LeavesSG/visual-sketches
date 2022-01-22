@@ -86,8 +86,6 @@ export default defineComponent({
           );
         });
       }
-
-      console.log(PSG);
     };
     const initAnimation = () => {
       if (!sceneInfo.ps) return;
@@ -118,7 +116,7 @@ export default defineComponent({
           z: e.position.z,
         }));
         PSG.unitArray.forEach((e, i) => e.setPosition(positions[i]));
-        console.log(PSG);
+        console.info(PSG);
         setTimeout(() => {
           initAnimation();
         }, 1000);

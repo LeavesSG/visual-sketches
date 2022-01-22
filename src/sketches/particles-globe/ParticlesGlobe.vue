@@ -52,7 +52,6 @@ export default defineComponent({
         if (ctx) {
           ctx.clearRect(0, 0, 800, 600);
           ctx.fillStyle = "black";
-          console.log(floatCanvas);
           filtered.forEach((e) => {
             const x = ((e % resolution.x) / resolution.x) * 300;
             const y = (Math.floor(e / resolution.x) / resolution.y) * 150;

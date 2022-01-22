@@ -158,7 +158,6 @@ export default defineComponent({
         if (newValue[i] !== oldValue[i]) idx = i;
       }
       const axisName = activeCoord.value[idx];
-      // console.log(methods.value);
       methods.value?.setMappingType(axisName, newValue[idx]);
     });
 

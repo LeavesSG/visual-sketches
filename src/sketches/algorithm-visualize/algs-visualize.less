@@ -19,25 +19,31 @@
   height: fit-content;
 }
 .bar {
-  background-color: #ffffffa0;
-  transition: transform 0.5s linear,
-    background-color 0.3s cubic-bezier(0.075, 0.82, 0.165, 1), width 0.3s,
-    opacity 0.3s;
+  transition: transform 0.2s linear, background-color 0.1s linear;
+  .bar-inner {
+    width: 50%;
+    height: 100%;
+    background-color: #ffffffa0;
+  }
 }
-.comparating {
+.comparating .bar-inner {
   background-color: goldenrod;
 }
-.sorting-items-move {
-  background-color: lightpink;
-}
-.sorting-items-enter-active {
-  background-color: lightgreen;
-}
+
 .sorting-items-leave-active {
+  width: 1px;
   opacity: 0.5;
-  position: relative;
+  position: absolute;
   background-color: lightcoral;
 }
+.sorting-items-enter-active .bar-inner {
+  background-color: lightgreen;
+}
+
+.sorting-items-move .bar-inner {
+  background-color: lightpink;
+}
+
 .operation-count {
   position: absolute;
   top: 10px;
@@ -50,4 +56,14 @@
   min-width: 200px;
   text-align: left;
   background-color: #ffffffa0;
+}
+.sorting-value {
+  height: 100%;
+  display: flex;
+  align-items: center;
+
+  position: absolute;
+  color: #333;
+  top: -1em;
+  font-size: 1.5rem;
 }

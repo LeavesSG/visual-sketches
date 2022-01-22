@@ -57,7 +57,6 @@ class ParticleSystem {
     });
 
     this.activeGraph.groupAllArea(this.unitArray);
-    console.log(this.activeGraph.areaGrouper);
     this.unitArray.forEach((e) => {
       this.activeGraph.evenlyFill(e);
       e.targetPos = this.activeGraph.locateUnit(e);

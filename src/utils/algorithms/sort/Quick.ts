@@ -1,3 +1,4 @@
+import { useShuffle } from "../shuffle/Shuffle";
 import { CompareFunction } from "./../types";
 import { OperationRecorder } from "../visualize-tools/operation-recorder";
 import { exch, isSorted, less as utilsLess } from "./sort-utils";
@@ -27,19 +28,25 @@ export const useQuickSort = <T>(
     return unSorted;
   }
 
-  let h = 1;
-  while (h < (N - S) / 3) h = h * 3 + 1;
-  while (h >= 1) {
-    for (let i = S + h; i < N; i++) {
-      for (let j = i; j >= h && less(a, j, j - h, recorder); j -= h) {
-        exch(a, j, j - h, recorder);
-      }
-    }
-    h = Math.floor(h / 3);
-  }
-  // main loop
+  useShuffle(a, less, S, N, recorder);
+  sort(a, S, N, less, recorder);
+
+  // final check
   isSorted(a, S, N, less, recorder);
   return a;
+};
+
+const sort = <T>(
+  a: T[],
+  i: number,
+  j: number,
+  less: CompareFunction,
+  recorder?: OperationRecorder
+) => {
+  if (j <= i) return;
+  const mid = partition(a, i, j, less, recorder);
+  sort(a, i, mid, less, recorder);
+  sort(a, mid + 1, j, less, recorder);
 };
 
 const partition = <T>(
@@ -47,5 +54,17 @@ const partition = <T>(
   i: number,
   j: number,
   less: CompareFunction,
-  recorder: OperationRecorder
-) => {};
+  recorder?: OperationRecorder
+) => {
+  let m = i;
+  let n = j;
+  while (true) {
+    while (less(a, ++m, i, recorder)) if (m === j - 1) break;
+    while (less(a, i, --n, recorder)) if (n === i) break;
+    if (m >= n) break;
+    exch(a, m, n, recorder);
+  }
+  exch(a, i, n, recorder);
+
+  return n;
+};

@@ -1,6 +1,5 @@
-import { CompareFunction } from "./../types";
-import { OperationRecorder } from "./../visualize-tools/operation-recorder";
-import { OperationRecord } from "../types";
+import { CompareFunction } from "../types";
+import { OperationRecorder } from "../visualize-tools/operation-recorder";
 import { exch } from "../sort/sort-utils";
 
 export const useShuffle = <T>(
@@ -10,7 +9,6 @@ export const useShuffle = <T>(
   end?: number,
   recorder?: OperationRecorder
 ) => {
-  debugger;
   const a = source;
   const S = start || 0;
   const N = end || a.length;

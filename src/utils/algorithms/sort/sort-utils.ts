@@ -1,21 +1,23 @@
+import { useQuickSort } from "./Quick";
 import { useMergePlusSort } from "./MergePlus";
 import { useMergeSort } from "./Merge";
 import { useSelectionSort } from "./Selection";
 import { useInsertionSort } from "./Insertion";
 import { useShellSort } from "./Shell";
 import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { useShuffle } from "../basic/Shuffle";
+import { useShuffle } from "../shuffle/Shuffle";
 
 /**
  * @Map Dictionary that keep all the sorting methods.
  */
 export const sortAlgsDict = new Map([
+  ["Shuffle", useShuffle],
   ["Selection", useSelectionSort],
   ["Insertion", useInsertionSort],
   ["Shell", useShellSort],
   ["Merge", useMergeSort],
   ["Merge+", useMergePlusSort],
-  ["Shuffle", useShuffle],
+  ["Quick", useQuickSort],
 ]);
 /**
  * @Map Dictionary that keep the name and realteive velocity for sorting methods.
@@ -26,6 +28,7 @@ export const algsRelativeVelocity = new Map([
   ["Shell", 2],
   ["Merge", 3],
   ["Merge+", 3],
+  ["Quick", 4],
 ]);
 
 export const isSorted = <T>(

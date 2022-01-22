@@ -4,16 +4,26 @@ import {
   algsRelativeVelocity,
   sortAlgsDict,
 } from "@/utils/algorithms/sort/sort-utils";
-import { defineComponent, onMounted, reactive, ref, watch } from "vue";
+import {
+  computed,
+  defineComponent,
+  onMounted,
+  reactive,
+  ref,
+  watch,
+} from "vue";
 import { OperationRecord } from "@/utils/algorithms/types";
+import { Vue } from "vue-class-component";
 
 export default defineComponent({
   setup() {
     const sourceArray = Array.from({ length: 10000 }, () => Math.random());
+    const container = ref<Vue | null>(null);
+    const containerWidth = computed(() => container.value?.$el.offsetWidth);
 
     // settings 配置项
     const useDynamicDataLength = ref(false);
-    const basicLength = ref(100);
+    const basicLength = ref(300);
     const maxCostPerFrame = ref(5);
     const shuffleOnReset = ref(false);
 
@@ -33,6 +43,8 @@ export default defineComponent({
     const recorder = new OperationRecorder();
     const operationCount = ref(0);
     const operationCost = ref(0);
+    const operationStep = ref(100000);
+    const stepIn = () => operationStep.value++;
 
     // indicators 运行指标
     const runTimeInfo = reactive<AlgsRunTimeInfo>(emptyInfo);
@@ -73,7 +85,10 @@ export default defineComponent({
 
     const play = () => {
       if (recorder.hasNext()) {
-        while (operationCost.value <= maxCostPerFrame.value * frame.value) {
+        while (
+          operationCost.value <= maxCostPerFrame.value * frame.value &&
+          operationCost.value <= operationStep.value
+        ) {
           // operation iteration  操作记录仪迭代
           const operation = recorder.play();
           operation?.function(sorting.value, ...operation?.args.slice(1));
@@ -122,12 +137,15 @@ export default defineComponent({
       activeRaf.value = requestAnimationFrame(play);
     };
 
-    watch(usingAlgsName, () => {
+    watch(usingAlgsName, (newVal, oldVal) => {
+      if (oldVal.includes("merge")) shuffleOnReset.value = true;
       useSort();
     });
 
     onMounted(useSort);
     return {
+      container,
+      containerWidth,
       sorting,
       comparating,
       usingAlgsName,
@@ -135,6 +153,7 @@ export default defineComponent({
       operationCount,
       allSortAlgsList,
       runTimeInfo,
+      stepIn,
     };
   },
 });

@@ -1,7 +1,12 @@
 <template>
   <div class="view">
     <!-- soring-items -->
-    <transition-group name="sorting-items" tag="div" class="container">
+    <transition-group
+      name="sorting-items"
+      tag="div"
+      class="container"
+      ref="container"
+    >
       <div
         class="bar"
         v-for="(item, index) in sorting"
@@ -9,9 +14,12 @@
         :key="item"
         :style="{
           height: item * 100 + '%',
-          width: 1280 / sorting.length + 'px',
+          width: containerWidth / sorting.length + 'px',
+          left: (containerWidth / sorting.length) * index + 'px',
         }"
-      ></div>
+      >
+        <div class="bar-inner"></div>
+      </div>
     </transition-group>
     <!-- algs switcher -->
     <el-tabs
@@ -27,7 +35,7 @@
       ></el-tab-pane>
     </el-tabs>
     <!-- info-card -->
-    <el-card class="info-card">
+    <el-card class="info-card" @click="stepIn">
       <div
         v-for="item in Object.values(runTimeInfo)"
         :key="item.label"
