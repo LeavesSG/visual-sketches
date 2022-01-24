@@ -18,7 +18,7 @@
           left: (containerWidth / sorting.length) * index + 'px',
         }"
       >
-        <div class="bar-inner"></div>
+        <div class="bar-inner" :key="'child' + index"></div>
       </div>
     </transition-group>
     <!-- algs switcher -->
@@ -40,10 +40,38 @@
         v-for="item in Object.values(runTimeInfo)"
         :key="item.label"
         class="text item"
+        @click="stepIn"
       >
         {{ item.label + ":  " + item.value + " " + (item.unit || "") }}
       </div>
     </el-card>
+    <!-- algs controller -->
+    <div class="controller">
+      <div class="controller-item">
+        <span class="label">基础长度</span
+        ><el-slider
+          v-model="settings.basicLength"
+          :min="1"
+          :max="200"
+        ></el-slider>
+      </div>
+      <div class="controller-item">
+        <span class="label">动画速率</span
+        ><el-slider
+          v-model="settings.maxCostPerFrame"
+          :min="0.5"
+          :max="10"
+        ></el-slider>
+      </div>
+      <div class="controller-item">
+        <span class="label">动态长度</span
+        ><el-switch v-model="settings.useDynamicDataLength" />
+      </div>
+      <div class="controller-item">
+        <span class="label">自动洗牌</span
+        ><el-switch v-model="settings.shuffleOnReset" />
+      </div>
+    </div>
   </div>
 </template>
 

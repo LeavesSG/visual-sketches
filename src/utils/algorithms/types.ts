@@ -17,7 +17,7 @@ export interface CompareFunction {
 export interface SortFunction {
   <T>(
     source: T[],
-    less: CompareFunction,
+    less?: CompareFunction,
     start?: number,
     end?: number,
     recorder?: OperationRecorder

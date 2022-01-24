@@ -1,9 +1,6 @@
 import { AlgsRunTimeInfo, emptyInfo } from "./types";
 import { OperationRecorder } from "@/utils/algorithms/visualize-tools/operation-recorder";
-import {
-  algsRelativeVelocity,
-  sortAlgsDict,
-} from "@/utils/algorithms/sort/sort-utils";
+import { sortAlgsDict } from "@/utils/algorithms/sort/sort-utils";
 import {
   computed,
   defineComponent,
@@ -22,10 +19,17 @@ export default defineComponent({
     const containerWidth = computed(() => container.value?.$el.offsetWidth);
 
     // settings 配置项
-    const useDynamicDataLength = ref(false);
-    const basicLength = ref(300);
+    const useDynamicDataLength = ref(true);
+    const basicLength = ref(100);
     const maxCostPerFrame = ref(5);
-    const shuffleOnReset = ref(false);
+    const shuffleOnReset = ref(true);
+    const requiredShuffle = ref(false);
+    const settings = reactive({
+      useDynamicDataLength,
+      basicLength,
+      maxCostPerFrame,
+      shuffleOnReset,
+    });
 
     // sorting stuffs 排序列表
     const unSorted = ref<number[]>([]);
@@ -43,7 +47,7 @@ export default defineComponent({
     const recorder = new OperationRecorder();
     const operationCount = ref(0);
     const operationCost = ref(0);
-    const operationStep = ref(100000);
+    const operationStep = ref(Infinity);
     const stepIn = () => operationStep.value++;
 
     // indicators 运行指标
@@ -56,11 +60,15 @@ export default defineComponent({
     const frame = ref(0);
     const activeRaf = ref(0);
 
-    const init = (shuffleArray = true) => {
+    const init = () => {
       // different source data length for different algorithms 动态调整数组长度
-      if (shuffleArray || sorting.value.length < 2) {
+      if (
+        shuffleOnReset.value ||
+        sorting.value.length < 2 ||
+        requiredShuffle.value
+      ) {
         const algsSpeed = useDynamicDataLength.value
-          ? algsRelativeVelocity.get(usingAlgsName.value) || 1
+          ? sortAlgsDict.get(usingAlgsName.value)?.relativeVelocity || 1
           : 1;
         unSorted.value = [
           ...sourceArray.slice(0, Math.floor(basicLength.value * algsSpeed)),
@@ -125,10 +133,9 @@ export default defineComponent({
     const useSort = () => {
       cancelAnimationFrame(activeRaf.value);
 
-      init(shuffleOnReset.value);
-      const usingAlgorithm = sortAlgsDict.get(usingAlgsName.value);
+      const usingAlgorithm = sortAlgsDict.get(usingAlgsName.value)?.function;
       if (!usingAlgorithm) return;
-
+      init();
       usingAlgorithm(unSorted.value, undefined, undefined, undefined, recorder);
       // update info  更新指标信息
       algsStartTime.value = recorder.getEarliestTime() || 0;
@@ -137,8 +144,9 @@ export default defineComponent({
       activeRaf.value = requestAnimationFrame(play);
     };
 
-    watch(usingAlgsName, (newVal, oldVal) => {
-      if (oldVal.includes("merge")) shuffleOnReset.value = true;
+    watch(usingAlgsName, (_newVal, oldVal) => {
+      if (sortAlgsDict.get(oldVal)?.inPlace) requiredShuffle.value = false;
+      else requiredShuffle.value = true;
       useSort();
     });
 
@@ -154,6 +162,7 @@ export default defineComponent({
       allSortAlgsList,
       runTimeInfo,
       stepIn,
+      settings,
     };
   },
 });
