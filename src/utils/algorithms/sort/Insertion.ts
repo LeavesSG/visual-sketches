@@ -1,6 +1,7 @@
-import { CompareFunction, SortFunction } from "../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { exch, isSorted, less as utilsLess } from "./sort-utils";
+import { __exch, __less } from "./../manipulations/manipulations";
+import { CompareFunction } from "../types";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Insertion sort to sort a array of comparables.
@@ -11,10 +12,10 @@ import { exch, isSorted, less as utilsLess } from "./sort-utils";
  */
 export const useInsertionSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   const a = unSorted;
   const S = start || 0;
@@ -30,7 +31,7 @@ export const useInsertionSort = <T>(
   // main loop
   for (let i = S; i < N; i++) {
     for (let j = i; j > S && less(a, j, j - 1, recorder); j--) {
-      exch(a, j, j - 1, recorder);
+      __exch(a, j, j - 1, recorder);
     }
   }
   isSorted(a, S, N, less, recorder);

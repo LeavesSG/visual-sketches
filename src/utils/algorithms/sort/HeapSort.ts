@@ -1,7 +1,8 @@
 import { BinaryHeap } from "./../../data-structures/heap/BinaryHeap";
 import { CompareFunction, SortFunction } from "../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { exch, isSorted, less as utilsLess } from "./sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
+import { __less } from "../manipulations/manipulations";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Heap sort to sort a array of comparables.
@@ -12,10 +13,10 @@ import { exch, isSorted, less as utilsLess } from "./sort-utils";
  */
 export const useHeapSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   const a = unSorted;
   const S = start || 0;

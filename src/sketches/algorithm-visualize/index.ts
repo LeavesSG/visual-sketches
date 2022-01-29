@@ -1,5 +1,5 @@
 import { AlgsRunTimeInfo, emptyInfo } from "./types";
-import { OperationRecorder } from "@/utils/algorithms/visualize-tools/operation-recorder";
+import { ManipulationRecorder } from "@/utils/algorithms/visualize-tools/manipulation-recorder";
 import { sortAlgsDict } from "@/utils/algorithms/sort/sort-utils";
 import {
   computed,
@@ -11,6 +11,7 @@ import {
 } from "vue";
 import { OperationRecord } from "@/utils/algorithms/types";
 import { Vue } from "vue-class-component";
+import { ArrayAcessType } from "@/utils/algorithms/manipulations/manipulations";
 
 export default defineComponent({
   setup() {
@@ -21,7 +22,7 @@ export default defineComponent({
     // settings 配置项
     const useDynamicDataLength = ref(true);
     const basicLength = ref(100);
-    const maxCostPerFrame = ref(5);
+    const maxCostPerFrame = ref(10);
     const shuffleOnReset = ref(true);
     const requiredShuffle = ref(false);
     const settings = reactive({
@@ -44,7 +45,7 @@ export default defineComponent({
 
     // operation recorder 操作记录仪
     const operations = ref<OperationRecord[]>([]);
-    const recorder = new OperationRecorder();
+    const recorder = new ManipulationRecorder();
     const operationCount = ref(0);
     const operationCost = ref(0);
     const operationStep = ref(Infinity);
@@ -52,7 +53,7 @@ export default defineComponent({
 
     // indicators 运行指标
     const runTimeInfo = reactive<AlgsRunTimeInfo>(emptyInfo);
-    const comparating = ref<number[]>([]);
+    const arrayEntring = ref<number[]>([]);
     const algsStartTime = ref(0);
     const animationStartTime = ref(0);
 
@@ -81,7 +82,7 @@ export default defineComponent({
       // reset all variables 重制所有指标
       operations.value = [];
       recorder.reset();
-      comparating.value = [];
+      arrayEntring.value = [];
       operationCount.value = 0;
       operationCost.value = 0;
       frame.value = 0;
@@ -93,31 +94,40 @@ export default defineComponent({
 
     const play = () => {
       if (recorder.hasNext()) {
+        let inComplete = false;
         while (
-          operationCost.value <= maxCostPerFrame.value * frame.value &&
-          operationCost.value <= operationStep.value
+          recorder.hasNext() &&
+          ((operationCost.value <= maxCostPerFrame.value * frame.value &&
+            operationCost.value <= operationStep.value) ||
+            inComplete)
         ) {
           // operation iteration  操作记录仪迭代
           const operation = recorder.play();
-          operation?.function(sorting.value, ...operation?.args.slice(1));
-          if (operation?.name === "less")
-            comparating.value = [...operation?.args.slice(1)];
-
-          // update info  更新指标信息
-          runTimeInfo.operationCount.value = operationCount.value.toString();
-          runTimeInfo.operationCost.value = operationCost.value.toString();
-          runTimeInfo.currentOperation.value = operation?.name || "";
-          if (operation?.operateTime)
-            runTimeInfo.codeRunTime.value = String(
-              operation?.operateTime - algsStartTime.value
+          if (operation) {
+            const usingFunction = recorder.usingFunctions.get(operation?.func);
+            const targets = operation.targets.map((t) =>
+              recorder.usingTargets.get(t)
             );
-          runTimeInfo.animationRunTime.value = String(
-            ((Date.now() - animationStartTime.value) / 1000).toFixed(2)
-          );
+            usingFunction(...targets, ...operation.args);
+            if (operation?.func === ArrayAcessType.GETTER)
+              arrayEntring.value = [...operation?.args];
+            inComplete = operation.inComplete;
+            // update info  更新指标信息
+            runTimeInfo.operationCount.value = operationCount.value.toString();
+            runTimeInfo.operationCost.value = operationCost.value.toString();
+            runTimeInfo.currentOperation.value = operation?.entry || "";
+            if (operation?.manipulateTime)
+              runTimeInfo.codeRunTime.value = String(
+                (operation?.manipulateTime - algsStartTime.value).toFixed(1)
+              );
+            runTimeInfo.animationRunTime.value = String(
+              ((Date.now() - animationStartTime.value) / 1000).toFixed(2)
+            );
 
-          // operation counter increment  操作记录增量
-          operationCost.value += operation?.cost || 1;
-          operationCount.value++;
+            // operation counter increment  操作记录增量
+            operationCost.value += operation?.cost || 1;
+            operationCount.value++;
+          }
         }
         // update info  更新指标信息
         runTimeInfo.frameCount.value = frame.value.toString();
@@ -126,7 +136,7 @@ export default defineComponent({
         frame.value++;
         activeRaf.value = requestAnimationFrame(play);
       } else {
-        comparating.value = [];
+        arrayEntring.value = [];
       }
     };
 
@@ -136,11 +146,13 @@ export default defineComponent({
       const usingAlgorithm = sortAlgsDict.get(usingAlgsName.value)?.function;
       if (!usingAlgorithm) return;
       init();
+      recorder.validateTarget(unSorted.value, "sorting-base");
       usingAlgorithm(unSorted.value, undefined, undefined, undefined, recorder);
       // update info  更新指标信息
       algsStartTime.value = recorder.getEarliestTime() || 0;
       animationStartTime.value = Date.now();
 
+      recorder.usingTargets.set("sorting-base", sorting.value);
       activeRaf.value = requestAnimationFrame(play);
     };
 
@@ -155,7 +167,7 @@ export default defineComponent({
       container,
       containerWidth,
       sorting,
-      comparating,
+      arrayEntring,
       usingAlgsName,
       operations,
       operationCount,

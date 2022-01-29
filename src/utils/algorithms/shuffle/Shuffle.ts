@@ -1,20 +1,20 @@
+import { __exch } from "../manipulations/manipulations";
 import { CompareFunction } from "../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { exch } from "../sort/sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
 
 export const useShuffle = <T>(
   source: T[],
-  less?: CompareFunction,
+  _less?: CompareFunction,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
   const a = source;
   const S = start || 0;
   const N = end || a.length;
   for (let i = S; i < N; i++) {
     const randomInt = Math.floor(Math.random() * (i - S)) + S;
-    exch(a, i, randomInt, recorder);
+    __exch(a, i, randomInt, recorder);
   }
   return a;
 };

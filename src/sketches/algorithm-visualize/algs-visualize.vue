@@ -10,8 +10,8 @@
       <div
         class="bar"
         v-for="(item, index) in sorting"
-        :class="{ comparating: comparating.includes(index) }"
-        :key="item"
+        :class="{ comparating: arrayEntring.includes(index) }"
+        :key="index"
         :style="{
           height: item * 100 + '%',
           width: containerWidth / sorting.length + 'px',

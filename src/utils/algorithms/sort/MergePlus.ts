@@ -1,7 +1,8 @@
+import { __copy, __less, __setter } from "./../manipulations/manipulations";
 import { useInsertionSort } from "./Insertion";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { copy, exch, isSorted, less as utilsLess, setter } from "./sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
 import { CompareFunction } from "../types";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Merge sort to sort a array of comparables.
@@ -12,10 +13,10 @@ import { CompareFunction } from "../types";
  */
 export const useMergePlusSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   // variables
   const a = unSorted;
@@ -41,7 +42,7 @@ const sort = <T>(
   end: number,
   aux: T[],
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
   if (end - start < 8) {
     useInsertionSort(source, less, start, end, recorder);
@@ -60,21 +61,21 @@ export const merge = <T>(
   end: number,
   aux: T[],
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
-  copy(source, aux, start, end, recorder);
+  __copy(aux, source, start, end, recorder);
   let i = start;
   let j = mid;
   while (i < mid || j < end) {
     const curr = i + j - mid;
     if (i >= mid) {
-      setter(source, curr, aux, j++, recorder);
+      __setter(source, aux, curr, j++, recorder);
     } else if (j >= end) {
-      setter(source, curr, aux, i++, recorder);
+      __setter(source, aux, curr, i++, recorder);
     } else if (less(aux, i, j, recorder)) {
-      setter(source, curr, aux, i++, recorder);
+      __setter(source, aux, curr, i++, recorder);
     } else if (!less(aux, i, j, recorder)) {
-      setter(source, curr, aux, j++, recorder);
+      __setter(source, aux, curr, j++, recorder);
     }
   }
 };

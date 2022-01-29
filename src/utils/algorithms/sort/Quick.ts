@@ -1,7 +1,9 @@
+import { useInsertionSort } from "./Insertion";
+import { __exch, __less } from "./../manipulations/manipulations";
 import { useShuffle } from "../shuffle/Shuffle";
 import { CompareFunction } from "./../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { exch, isSorted, less as utilsLess } from "./sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Quick sort to sort a array of comparables.
@@ -12,10 +14,10 @@ import { exch, isSorted, less as utilsLess } from "./sort-utils";
  */
 export const useQuickSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   const a = unSorted;
   const S = start || 0;
@@ -41,9 +43,12 @@ const sort = <T>(
   i: number,
   j: number,
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
-  if (j <= i) return;
+  if (j - i <= 7) {
+    useInsertionSort(a, less, i, j, recorder);
+    return;
+  }
   const mid = partition(a, i, j, less, recorder);
   sort(a, i, mid, less, recorder);
   sort(a, mid + 1, j, less, recorder);
@@ -54,17 +59,38 @@ const partition = <T>(
   i: number,
   j: number,
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
+  const mid = findMid(a, i, j - 1, less, recorder);
+  __exch(a, i, mid, recorder);
   let m = i;
   let n = j;
   while (true) {
     while (less(a, ++m, i, recorder)) if (m === j - 1) break;
     while (less(a, i, --n, recorder)) if (n === i) break;
     if (m >= n) break;
-    exch(a, m, n, recorder);
+    __exch(a, m, n, recorder);
   }
-  exch(a, i, n, recorder);
+  __exch(a, i, n, recorder);
 
   return n;
+};
+
+const findMid = <T>(
+  a: T[],
+  i: number,
+  j: number,
+  less: CompareFunction,
+  recorder?: ManipulationRecorder
+) => {
+  const lessIJ = less(a, i, j, recorder) ? i : j;
+  const another = lessIJ === i ? j : i;
+  if (j - i <= 2) return lessIJ;
+  else {
+    const mid = Math.floor((i + j) / 2);
+    if (less(a, lessIJ, mid, recorder)) {
+      return less(a, another, mid, recorder) ? another : mid;
+    }
+    return lessIJ;
+  }
 };

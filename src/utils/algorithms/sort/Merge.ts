@@ -1,6 +1,12 @@
+import {
+  __copy,
+  __exch,
+  __less,
+  __setter,
+} from "./../manipulations/manipulations";
 import { CompareFunction } from "./../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { copy, exch, isSorted, less as utilsLess, setter } from "./sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Merge sort to sort a array of comparables.
@@ -11,10 +17,10 @@ import { copy, exch, isSorted, less as utilsLess, setter } from "./sort-utils";
  */
 export const useMergeSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   // variables
   const a = unSorted;
@@ -40,11 +46,11 @@ const sort = <T>(
   end: number,
   aux: T[],
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
   if (end - start <= 2) {
     if (end - start === 2 && !less(source, start, start + 1, recorder)) {
-      exch(source, start, start + 1, recorder);
+      __exch(source, start, start + 1, recorder);
     }
   } else {
     const mid = Math.floor((start + end) / 2);
@@ -61,21 +67,21 @@ export const merge = <T>(
   end: number,
   aux: T[],
   less: CompareFunction,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ) => {
-  copy(source, aux, start, end, recorder);
+  __copy(aux, source, start, end, recorder);
   let i = start;
   let j = mid;
   while (i < mid || j < end) {
     const curr = i + j - mid;
     if (i >= mid) {
-      setter(source, curr, aux, j++, recorder);
+      __setter(source, aux, curr, j++, recorder);
     } else if (j >= end) {
-      setter(source, curr, aux, i++, recorder);
+      __setter(source, aux, curr, i++, recorder);
     } else if (less(aux, i, j, recorder)) {
-      setter(source, curr, aux, i++, recorder);
+      __setter(source, aux, curr, i++, recorder);
     } else if (!less(aux, i, j, recorder)) {
-      setter(source, curr, aux, j++, recorder);
+      __setter(source, aux, curr, j++, recorder);
     }
   }
 };

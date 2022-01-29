@@ -1,4 +1,4 @@
-import { OperationRecorder } from "./visualize-tools/operation-recorder";
+import { ManipulationRecorder } from "./visualize-tools/manipulation-recorder";
 
 export interface OperationRecord {
   name: string;
@@ -6,12 +6,17 @@ export interface OperationRecord {
   args: any[];
   hasEffect?: boolean;
   cost?: number;
-  operateTime?: number;
+  manipulateTime?: number;
   playedTime?: number;
 }
 
 export interface CompareFunction {
-  <T>(source: T[], i: number, j: number, recorder?: OperationRecorder): boolean;
+  <T>(
+    source: T[],
+    i: number,
+    j: number,
+    recorder?: ManipulationRecorder
+  ): boolean;
 }
 
 export interface SortFunction {
@@ -20,6 +25,6 @@ export interface SortFunction {
     less?: CompareFunction,
     start?: number,
     end?: number,
-    recorder?: OperationRecorder
+    recorder?: ManipulationRecorder
   ): T[];
 }

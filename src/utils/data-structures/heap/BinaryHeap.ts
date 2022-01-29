@@ -1,5 +1,5 @@
-import { OperationRecorder } from "@/utils/algorithms/visualize-tools/operation-recorder";
-import { exch, less as _less } from "../../algorithms/sort/sort-utils";
+import { __exch, __less } from "@/utils/algorithms/manipulations/manipulations";
+import { ManipulationRecorder } from "@/utils/algorithms/visualize-tools/manipulation-recorder";
 import { CompareFunction } from "../../algorithms/types";
 
 /**
@@ -12,20 +12,21 @@ export class BinaryHeap<T> {
   private a: T[];
   private N: number;
   private less: CompareFunction;
-  private recorder: OperationRecorder | undefined;
+  private recorder: ManipulationRecorder | undefined;
 
   constructor(
     source: T[],
-    less: CompareFunction = _less,
+    less: CompareFunction = __less,
     start?: number,
     end?: number,
-    recorder?: OperationRecorder
+    recorder?: ManipulationRecorder
   ) {
     this.a = source.slice(start, end);
     this.N = this.a.length - 1;
     if (end && start) this.N = end - start - 1;
     this.less = less;
     this.recorder = recorder;
+    if (this.recorder) this.recorder.validateTarget(this.a, "sorting-base");
     this.heapOrder();
   }
 
@@ -39,7 +40,7 @@ export class BinaryHeap<T> {
 
   private swim(k: number) {
     while (k > 0 && this.less(this.a, this.getParent(k), k, this.recorder)) {
-      exch(this.a, k, this.getParent(k), this.recorder);
+      __exch(this.a, k, this.getParent(k), this.recorder);
       k = this.getParent(k);
     }
   }
@@ -49,7 +50,7 @@ export class BinaryHeap<T> {
       let j = this.getFirstChild(k);
       if (j < this.N && this.less(this.a, j, j + 1, this.recorder)) j++;
       if (this.less(this.a, j, k, this.recorder)) break;
-      exch(this.a, k, j, this.recorder);
+      __exch(this.a, k, j, this.recorder);
       k = j;
     }
   }
@@ -61,7 +62,7 @@ export class BinaryHeap<T> {
   }
 
   public deleteMax() {
-    exch(this.a, 0, this.N--, this.recorder);
+    __exch(this.a, 0, this.N--, this.recorder);
     this.sink(0);
     return this.a.pop();
   }

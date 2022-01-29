@@ -1,6 +1,7 @@
+import { __exch, __less } from "./../manipulations/manipulations";
 import { CompareFunction } from "../types";
-import { OperationRecorder } from "../visualize-tools/operation-recorder";
-import { exch, isSorted, less as utilsLess } from "./sort-utils";
+import { ManipulationRecorder } from "../visualize-tools/manipulation-recorder";
+import { isSorted } from "./sort-utils";
 
 /**
  * use Selection sort to sort a array of comparables.
@@ -11,10 +12,10 @@ import { exch, isSorted, less as utilsLess } from "./sort-utils";
  */
 export const useSelectionSort = <T>(
   unSorted: T[],
-  less: CompareFunction = utilsLess,
+  less: CompareFunction = __less,
   start?: number,
   end?: number,
-  recorder?: OperationRecorder
+  recorder?: ManipulationRecorder
 ): T[] => {
   const a = unSorted;
   const S = start || 0;
@@ -34,7 +35,7 @@ export const useSelectionSort = <T>(
       const isLess = less(a, j, min, recorder);
       if (isLess) min = j;
     }
-    exch(a, i, min, recorder);
+    __exch(a, i, min, recorder);
   }
   isSorted(a, S, N, less, recorder);
   return a;

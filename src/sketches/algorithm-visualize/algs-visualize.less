@@ -19,15 +19,12 @@
   height: fit-content;
 }
 .bar {
-  transition: transform 0.2s linear, background-color 0.1s linear;
+  transition: transform 0.2s linear, background-color 0.2s linear;
   .bar-inner {
     width: 100%;
     height: 100%;
     background-color: #ffffffa0;
   }
-}
-.comparating .bar-inner {
-  background-color: goldenrod;
 }
 
 .sorting-items-leave-active {
@@ -39,10 +36,13 @@
 .sorting-items-enter-active .bar-inner {
   background-color: lightgreen;
 }
-
-.sorting-items-move .bar-inner {
-  background-color: lightpink;
+.comparating .bar-inner {
+  background-color: goldenrod;
 }
+
+// .sorting-items-move .bar-inner {
+//   background-color: lightpink;
+// }
 
 .operation-count {
   position: absolute;
