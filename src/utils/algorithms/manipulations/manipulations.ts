@@ -117,10 +117,10 @@ export const __copy = <T>(
 ) => {
   activeEntry = "copy";
   for (let k = i; k < j; k++) {
-    if ((k = j - 1)) isKeyFrame = true;
+    // if ((k = j - 1)) isKeyFrame = true;
     __array_setter(target, k, __array_getter(source, k, recorder), recorder);
+    // isKeyFrame = false;
   }
-  isKeyFrame = false;
 };
 export const __setter = <T>(
   target: T[],

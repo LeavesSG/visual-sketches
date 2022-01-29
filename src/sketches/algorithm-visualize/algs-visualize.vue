@@ -11,7 +11,7 @@
         class="bar"
         v-for="(item, index) in sorting"
         :class="{ comparating: arrayEntring.includes(index) }"
-        :key="index"
+        :key="item"
         :style="{
           height: item * 100 + '%',
           width: containerWidth / sorting.length + 'px',
