@@ -54,8 +54,9 @@ export default defineComponent({
     // indicators 运行指标
     const runTimeInfo = reactive<AlgsRunTimeInfo>(emptyInfo);
     const arrayEntring = ref<number[]>([]);
-    const algsStartTime = ref(0);
-    const animationStartTime = ref(0);
+    const arraySetting = ref<number[]>([]);
+    const arrayEntryCount = ref(0);
+    const comparisonCount = ref(0);
 
     // animation control Raf动画控制
     const frame = ref(0);
@@ -81,11 +82,13 @@ export default defineComponent({
 
       // reset all variables 重制所有指标
       operations.value = [];
+      operationCost.value = 0;
       recorder.reset();
       arrayEntring.value = [];
       operationCount.value = 0;
-      operationCost.value = 0;
       frame.value = 0;
+      comparisonCount.value = 0;
+      arrayEntryCount.value = 0;
 
       // update info 更新指标信息
       runTimeInfo.algsName.value = usingAlgsName.value;
@@ -109,23 +112,27 @@ export default defineComponent({
               recorder.usingTargets.get(t)
             );
             usingFunction(...targets, ...operation.args);
+            inComplete = operation.inComplete;
+
+            // tracing active items
             if (operation?.func === ArrayAcessType.GETTER)
               arrayEntring.value = [...operation?.args];
-            inComplete = operation.inComplete;
+            if (operation?.func === ArrayAcessType.SETTER)
+              arraySetting.value = [operation?.args[0]];
+
             // update info  更新指标信息
-            runTimeInfo.operationCount.value = operationCount.value.toString();
-            runTimeInfo.operationCost.value = operationCost.value.toString();
-            runTimeInfo.currentOperation.value = operation?.entry || "";
-            if (operation?.manipulateTime)
-              runTimeInfo.codeRunTime.value = String(
-                (operation?.manipulateTime - algsStartTime.value).toFixed(1)
-              );
-            runTimeInfo.animationRunTime.value = String(
-              ((Date.now() - animationStartTime.value) / 1000).toFixed(2)
+            arrayEntryCount.value++;
+            runTimeInfo.currentOperation.value = operation.entry || "";
+            if (runTimeInfo.currentOperation.value === "less")
+              comparisonCount.value += 0.5;
+
+            runTimeInfo.arrayEntries.value = String(arrayEntryCount.value);
+            runTimeInfo.comparisons.value = String(
+              Math.ceil(comparisonCount.value)
             );
 
             // operation counter increment  操作记录增量
-            operationCost.value += operation?.cost || 1;
+            operationCost.value++;
             operationCount.value++;
           }
         }
@@ -148,9 +155,6 @@ export default defineComponent({
       init();
       recorder.validateTarget(unSorted.value, "sorting-base");
       usingAlgorithm(unSorted.value, undefined, undefined, undefined, recorder);
-      // update info  更新指标信息
-      algsStartTime.value = recorder.getEarliestTime() || 0;
-      animationStartTime.value = Date.now();
 
       recorder.usingTargets.set("sorting-base", sorting.value);
       activeRaf.value = requestAnimationFrame(play);
@@ -168,6 +172,7 @@ export default defineComponent({
       containerWidth,
       sorting,
       arrayEntring,
+      arraySetting,
       usingAlgsName,
       operations,
       operationCount,

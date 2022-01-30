@@ -58,7 +58,6 @@ export interface ManipulationRecord {
   cost: number; // cost of manipulation
   targets: string[]; // target array of the manipulation
   args: (number | string | any)[]; // manipulation arguements
-  manipulateTime: number; // time of the manipulation
   inComplete: boolean;
 }
 
@@ -75,7 +74,6 @@ const __generate_default_record = (
     targets: targets,
     cost: 1,
     args: args,
-    manipulateTime: performance.now(),
     inComplete: inComplete,
   };
 };

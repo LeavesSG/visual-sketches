@@ -16,7 +16,7 @@ export class ManipulationRecorder {
   public usingTargets = new Map<string, any>();
   public usingFunctions = new Map<string, any>();
 
-  constructor(media: usingStoreMedia = usingStoreMedia.none) {
+  constructor(media: usingStoreMedia = usingStoreMedia.localStorage) {
     this.storage = media;
   }
 
@@ -34,7 +34,6 @@ export class ManipulationRecorder {
     });
     if (id) return id;
     else {
-      debugger;
       id = specificID || `t${this.usingTargets.size}`;
       this.usingTargets.set(id, target);
       return id;
@@ -87,36 +86,6 @@ export class ManipulationRecorder {
 
   hasNext() {
     return this.cursor > 0;
-  }
-
-  getEarliestTime() {
-    const cursor = 0;
-    switch (this.storage) {
-      case usingStoreMedia.localStorage:
-        const first = localStorage.getItem(`m${cursor}`);
-        if (first) {
-          return JSON.parse(first).manipulateTime;
-        }
-      default:
-        return this.records[cursor]?.manipulateTime;
-    }
-  }
-
-  getLatestTime() {
-    const cursor = this.cursor - 1;
-    switch (this.storage) {
-      case usingStoreMedia.localStorage:
-        const first = localStorage.getItem(`m${cursor}`);
-        if (first) {
-          return JSON.parse(first).manipulateTime;
-        }
-      default:
-        return this.records[cursor]?.manipulateTime;
-    }
-  }
-
-  getTotalTimeCost() {
-    return (this.getLatestTime() || 0) - (this.getEarliestTime() || 0);
   }
 
   getRecord() {

@@ -8,7 +8,7 @@
   width: 70vw;
   height: 50vh;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
 }
 .algorithms-switcher {
   position: absolute;
@@ -37,7 +37,11 @@
   background-color: lightgreen;
 }
 .comparating .bar-inner {
-  background-color: goldenrod;
+  background-color: #ce10a080;
+}
+
+.setting .bar-inner {
+  background-color: #ce10a080;
 }
 
 // .sorting-items-move .bar-inner {
@@ -80,6 +84,7 @@
   color: black;
   padding: 30px;
   min-width: 150px;
+  display: none;
 
   .controller-item {
     display: -ms-grid;
