@@ -81,7 +81,6 @@ export default defineComponent({
           ];
         } else {
           maxCostPerFrame.value = maxCostPerFrame.value / algsSpeed;
-          console.log(maxCostPerFrame.value);
         }
         sorting.value = [...unSorted.value];
       } else {
