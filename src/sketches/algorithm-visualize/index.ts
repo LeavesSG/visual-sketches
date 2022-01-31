@@ -20,9 +20,9 @@ export default defineComponent({
     const containerWidth = computed(() => container.value?.$el.offsetWidth);
 
     // settings 配置项
-    const useDynamicDataLength = ref(true);
-    const basicLength = ref(100);
-    const maxCostPerFrame = ref(10);
+    const useDynamicDataLength = ref(false);
+    const basicLength = ref(400);
+    const maxCostPerFrame = ref(1);
     const shuffleOnReset = ref(true);
     const requiredShuffle = ref(false);
     const settings = reactive({
@@ -64,17 +64,25 @@ export default defineComponent({
 
     const init = () => {
       // different source data length for different algorithms 动态调整数组长度
+      maxCostPerFrame.value = 20;
       if (
         shuffleOnReset.value ||
         sorting.value.length < 2 ||
         requiredShuffle.value
       ) {
-        const algsSpeed = useDynamicDataLength.value
-          ? sortAlgsDict.get(usingAlgsName.value)?.relativeVelocity || 1
-          : 1;
+        const algsSpeed =
+          sortAlgsDict.get(usingAlgsName.value)?.relativeVelocity || 1;
         unSorted.value = [
-          ...sourceArray.slice(0, Math.floor(basicLength.value * algsSpeed)),
+          ...sourceArray.slice(0, Math.floor(basicLength.value)),
         ];
+        if (useDynamicDataLength.value) {
+          unSorted.value = [
+            ...sourceArray.slice(0, Math.floor(basicLength.value * algsSpeed)),
+          ];
+        } else {
+          maxCostPerFrame.value = maxCostPerFrame.value / algsSpeed;
+          console.log(maxCostPerFrame.value);
+        }
         sorting.value = [...unSorted.value];
       } else {
         unSorted.value = [...sorting.value];
@@ -143,7 +151,7 @@ export default defineComponent({
         frame.value++;
         activeRaf.value = requestAnimationFrame(play);
       } else {
-        arrayEntring.value = [];
+        // arrayEntring.value = [];
       }
     };
 
@@ -155,7 +163,6 @@ export default defineComponent({
       init();
       recorder.validateTarget(unSorted.value, "sorting-base");
       usingAlgorithm(unSorted.value, undefined, undefined, undefined, recorder);
-
       recorder.usingTargets.set("sorting-base", sorting.value);
       activeRaf.value = requestAnimationFrame(play);
     };

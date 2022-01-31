@@ -21,7 +21,28 @@
           left: (containerWidth / sorting.length) * index + 'px',
         }"
       >
-        <div class="bar-inner" :key="'child' + index"></div>
+        <div class="bar-inner" :key="'child' + item"></div>
+      </div>
+      <div
+        class="getter-indicator"
+        key="2"
+        :style="{
+          left: (containerWidth / sorting.length) * arrayEntring[0] + 'px',
+          color: '#cea010',
+        }"
+      >
+        ⬆ Array Entry Get
+      </div>
+      <div
+        class="setter-indicator"
+        key="3"
+        :style="{
+          left: (containerWidth / sorting.length) * arraySetting[0] + 'px',
+          bottom: '-18%',
+          color: '#ce10a0',
+        }"
+      >
+        ⬆ Set
       </div>
     </transition-group>
     <!-- algs switcher -->
@@ -49,7 +70,7 @@
       </div>
     </el-card>
     <!-- algs controller -->
-    <div class="controller">
+    <!-- <div class="controller">
       <div class="controller-item">
         <span class="label">基础长度</span
         ><el-slider
@@ -74,7 +95,7 @@
         <span class="label">自动洗牌</span
         ><el-switch v-model="settings.shuffleOnReset" />
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 

@@ -50,10 +50,10 @@
   pointer-events: none;
 }
 .logo1 {
-  animation: infinite rotateZ1 23s linear;
+  animation: infinite rotateZ1 19s linear;
 }
 .logo2 {
-  animation: infinite rotateZ2 29s linear;
+  animation: infinite rotateZ2 17s linear;
 }
 
 .gradient {

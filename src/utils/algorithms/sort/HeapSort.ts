@@ -30,7 +30,6 @@ export const useHeapSort = <T>(
   }
 
   const heap = new BinaryHeap(a, less, S, N, recorder);
-  console.log(heap.getHeapArray());
   for (let i = N - 1; i >= S; i--) {
     const max = heap.deleteMax();
     if (max) a[i] = max;

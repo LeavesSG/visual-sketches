@@ -16,7 +16,7 @@ export class ManipulationRecorder {
   public usingTargets = new Map<string, any>();
   public usingFunctions = new Map<string, any>();
 
-  constructor(media: usingStoreMedia = usingStoreMedia.localStorage) {
+  constructor(media: usingStoreMedia = usingStoreMedia.none) {
     this.storage = media;
   }
 

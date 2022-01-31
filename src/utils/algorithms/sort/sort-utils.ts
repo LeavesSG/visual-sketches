@@ -20,23 +20,23 @@ declare interface SortFunctionInfo {
  * @Map Dictionary that keep all the sorting methods.
  */
 export const sortAlgsDict = new Map<string, SortFunctionInfo>([
-  ["Shuffle", { function: useShuffle, relativeVelocity: 0, inPlace: true }],
+  ["Shuffle", { function: useShuffle, relativeVelocity: 1, inPlace: true }],
   [
     "Selection",
-    { function: useSelectionSort, relativeVelocity: 0.4, inPlace: true },
+    { function: useSelectionSort, relativeVelocity: 0.2, inPlace: true },
   ],
   [
     "Insertion",
-    { function: useInsertionSort, relativeVelocity: 0.4, inPlace: true },
+    { function: useInsertionSort, relativeVelocity: 0.25, inPlace: true },
   ],
-  ["Shell", { function: useShellSort, relativeVelocity: 2.5, inPlace: true }],
-  ["Merge", { function: useMergeSort, relativeVelocity: 3, inPlace: false }],
+  ["Shell", { function: useShellSort, relativeVelocity: 0.5, inPlace: true }],
+  // ["Merge", { function: useMergeSort, relativeVelocity: 0.7, inPlace: false }],
   [
     "Merge+",
-    { function: useMergePlusSort, relativeVelocity: 3.5, inPlace: false },
+    { function: useMergePlusSort, relativeVelocity: 0.8, inPlace: false },
   ],
-  ["Heap", { function: useHeapSort, relativeVelocity: 4, inPlace: true }],
-  ["Quick", { function: useQuickSort, relativeVelocity: 4, inPlace: true }],
+  ["Heap", { function: useHeapSort, relativeVelocity: 0.9, inPlace: true }],
+  ["Quick", { function: useQuickSort, relativeVelocity: 1, inPlace: true }],
 ]);
 
 export const isSorted = <T>(
