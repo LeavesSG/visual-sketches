@@ -37,6 +37,7 @@ export const useSelectionSort = <T>(
     }
     __exch(a, i, min, recorder);
   }
+
   isSorted(a, S, N, less, recorder);
   return a;
 };

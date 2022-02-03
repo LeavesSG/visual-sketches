@@ -23,11 +23,11 @@ export const sortAlgsDict = new Map<string, SortFunctionInfo>([
   ["Shuffle", { function: useShuffle, relativeVelocity: 1, inPlace: true }],
   [
     "Selection",
-    { function: useSelectionSort, relativeVelocity: 0.2, inPlace: true },
+    { function: useSelectionSort, relativeVelocity: 0.1, inPlace: true },
   ],
   [
     "Insertion",
-    { function: useInsertionSort, relativeVelocity: 0.25, inPlace: true },
+    { function: useInsertionSort, relativeVelocity: 0.1, inPlace: true },
   ],
   ["Shell", { function: useShellSort, relativeVelocity: 0.5, inPlace: true }],
   // ["Merge", { function: useMergeSort, relativeVelocity: 0.7, inPlace: false }],

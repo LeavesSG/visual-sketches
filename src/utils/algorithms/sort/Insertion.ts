@@ -34,6 +34,7 @@ export const useInsertionSort = <T>(
       __exch(a, j, j - 1, recorder);
     }
   }
+
   isSorted(a, S, N, less, recorder);
   return a;
 };
